@@ -1,0 +1,28 @@
+{
+  "name": "simple-planner",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "npm run build && electron . --no-sandbox --disable-dev-shm-usage",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/goodsky/simple-planner.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/goodsky/simple-planner/issues"
+  },
+  "homepage": "https://github.com/goodsky/simple-planner#readme",
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "electron": "^39.1.0",
+    "typescript": "^5.9.3"
+  }
+}
