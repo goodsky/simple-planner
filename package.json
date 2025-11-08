@@ -5,7 +5,7 @@
   "main": "dist/main.js",
   "scripts": {
     "build": "tsc",
-    "start": "npm run build && electron . --no-sandbox --disable-dev-shm-usage",
+    "start": "npm run build && electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
