@@ -13,7 +13,9 @@ function createWindow(): void {
     }
   });
 
-  mainWindow.loadFile(path.join(__dirname, '../index.html'));
+  mainWindow.loadFile(path.join(__dirname, '../public/index.html'));
+
+  console.log('Main window created');
 
   // Log when page loads
   mainWindow.webContents.on('did-finish-load', () => {
