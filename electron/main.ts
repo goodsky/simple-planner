@@ -1,19 +1,37 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
-import * as path from 'path';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
 import * as fs from 'fs/promises';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+process.env.APP_ROOT = path.join(__dirname, '../..');
+
+export const MAIN_DIST = path.join(process.env.APP_ROOT, 'dist-electron');
+export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist');
+export const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
+
+const indexHtml = path.join(RENDERER_DIST, 'index.html'); // should the index.html be in the dist?
+const preload = path.join(__dirname, '../preload/index.mjs');
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
+    title: 'Electron Vite React App',
     width: 800,
     height: 600,
     webPreferences: {
+      preload,
       nodeIntegration: false,
       contextIsolation: true,
-      preload: path.join(__dirname, 'preload.js')
-    }
+    },
   });
 
-  mainWindow.loadFile(path.join(__dirname, '../public/index.html'));
+  // Load from Vite dev server in development, or built files in production
+  if (VITE_DEV_SERVER_URL) {
+    mainWindow.loadURL(VITE_DEV_SERVER_URL);
+    mainWindow.webContents.openDevTools();
+  } else {
+    mainWindow.loadFile(indexHtml);
+  }
 
   console.log('Main window created');
 
@@ -30,7 +48,7 @@ function createWindow(): void {
 
 app.on('ready', () => {
   createWindow();
-})
+});
 
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
@@ -61,5 +79,3 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
-
-
