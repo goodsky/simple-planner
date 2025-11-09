@@ -28,6 +28,7 @@
     "vite-plugin-electron-renderer": "^0.14.6"
   },
   "dependencies": {
+    "electron-store": "^11.0.2",
     "lucide-react": "^0.553.0"
   }
 }

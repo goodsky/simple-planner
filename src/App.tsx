@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { Plus, Edit2, Trash2, Check, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Edit2, Trash2, Check, X, FolderOpen } from 'lucide-react';
 
 export default function App() {
   const [selectedDate, setSelectedDate] = useState(new Date(2025, 10, 10)); // Nov 10, 2025 (Monday)
+  const [workingDirectory, setWorkingDirectory] = useState<string>('~/Documents/work-todos');
 
   // Mock data for the selected day
   const [scheduleItems, setScheduleItems] = useState([
@@ -90,13 +91,42 @@ export default function App() {
     setChecklistItems((items) => items.filter((item) => item.id !== id));
   };
 
+  // Load working directory from settings on mount
+  useEffect(() => {
+    const loadDirectory = async () => {
+      if (window.electronAPI) {
+        const savedDirectory = await window.electronAPI.getSetting('workingDirectory');
+        if (savedDirectory) {
+          setWorkingDirectory(savedDirectory);
+        }
+      }
+    };
+    loadDirectory();
+  }, []);
+
+  // Handle folder selection
+  const handleSelectFolder = async () => {
+    if (window.electronAPI) {
+      const selectedFolder = await window.electronAPI.selectFolder();
+      if (selectedFolder) {
+        setWorkingDirectory(selectedFolder);
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Daily Todo</h1>
-          <p className="text-gray-600">Folder: ~/Documents/work-todos/</p>
+          <div className="flex items-center gap-3">
+            <p className="text-gray-600">Folder: {workingDirectory}</p>
+            <button onClick={handleSelectFolder} className="flex items-center gap-1 px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded transition-colors">
+              <FolderOpen size={16} />
+              Change
+            </button>
+          </div>
         </div>
 
         {/* Week Calendar */}

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import * as fs from 'fs/promises';
@@ -12,6 +12,23 @@ export const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
 
 const indexHtml = path.join(RENDERER_DIST, 'index.html');
 const preload = path.join(MAIN_DIST, 'preload.mjs');
+
+// Settings file path
+const settingsPath = path.join(app.getPath('userData'), 'settings.json');
+
+// Helper functions for settings
+async function loadSettings(): Promise<Record<string, any>> {
+  try {
+    const data = await fs.readFile(settingsPath, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    return {};
+  }
+}
+
+async function saveSettings(settings: Record<string, any>): Promise<void> {
+  await fs.writeFile(settingsPath, JSON.stringify(settings, null, 2), 'utf-8');
+}
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -72,6 +89,36 @@ ipcMain.handle('write-file', async (event, filePath: string, content: string) =>
   } catch (error) {
     throw new Error(`Failed to write file: ${error}`);
   }
+});
+
+// IPC handler for selecting a folder
+ipcMain.handle('select-folder', async () => {
+  const result = await dialog.showOpenDialog({
+    properties: ['openDirectory'],
+  });
+
+  if (!result.canceled && result.filePaths.length > 0) {
+    const selectedPath = result.filePaths[0];
+    const settings = await loadSettings();
+    settings.workingDirectory = selectedPath;
+    await saveSettings(settings);
+    return selectedPath;
+  }
+
+  return null;
+});
+
+// IPC handler for getting settings
+ipcMain.handle('get-setting', async (event, key: string) => {
+  const settings = await loadSettings();
+  return settings[key];
+});
+
+// IPC handler for saving settings
+ipcMain.handle('set-setting', async (event, key: string, value: any) => {
+  const settings = await loadSettings();
+  settings[key] = value;
+  await saveSettings(settings);
 });
 
 app.on('window-all-closed', () => {
