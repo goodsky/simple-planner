@@ -1,8 +1,9 @@
 {
-  "name": "template-electron-vite-react",
+  "name": "skylers-simple-planner",
   "version": "1.0.0",
   "license": "MIT",
-  "description": "Template project using vite, electron and react",
+  "description": "Simple planner to manage daily tasks using the filesystem.",
+  "author": "Skyler Goodell",
   "type": "module",
   "main": "dist-electron/main.js",
   "scripts": {
